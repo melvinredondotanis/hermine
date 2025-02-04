@@ -11,10 +11,10 @@ from .docker_utils import (
 from . import app
 
 
-@app.route('/create/<image>', methods=['GET'])
-def create(image):
+@app.route('/create/<string:image>', methods=['GET'])
+def create(image: str):
     result = create_container(image)
-    return jsonify(result)
+    return result
 
 
 @app.route('/start/<container_id>', methods=['GET'])
