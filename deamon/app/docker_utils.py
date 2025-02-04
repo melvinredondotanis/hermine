@@ -1,7 +1,7 @@
-from flask import request, jsonify
+from flask import jsonify
 import docker
 
-from . import client, app
+from . import client, app, db
 
 
 @app.route('/create/<string:image>', methods=['GET'])
@@ -13,6 +13,7 @@ def create_container(image: str):
             except docker.errors.ImageNotFound as e:
                 return jsonify(str(e)), 404
         container = client.containers.create(image)
+        db.insert({'container_id': container.id})
         return jsonify({'container_id': container.id}), 201
     except Exception as e:
         return jsonify(str(e)), 500
