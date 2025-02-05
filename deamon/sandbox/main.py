@@ -1,6 +1,7 @@
 from dotenv import dotenv_values
 
-from app.docker_utils import app
+from app.routes import app
+
 
 config = dotenv_values(".env")
 

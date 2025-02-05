@@ -1,6 +1,7 @@
 # Env
 .env
 *.env
+env/
 
 # OS files
 .DS_Store
@@ -12,6 +13,3 @@ __pycache__/
 *.pyo
 *.pyd
 venv/
-
-# Database
-*.json
