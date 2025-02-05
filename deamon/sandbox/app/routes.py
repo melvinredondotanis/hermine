@@ -1,7 +1,7 @@
 import docker
 from flask import jsonify, request
 
-from . import app, client, db
+from . import app, client
 
 
 def _fetch_container(container_id):
