@@ -1,5 +1,5 @@
 import docker
-from flask import jsonify
+from flask import jsonify, request
 
 from . import app, client, db
 
@@ -23,6 +23,19 @@ def create_container(image):
         except Exception as err:
             container.remove(force=True)
             return jsonify(str(err)), 500
+    except docker.errors.APIError as err:
+        return jsonify(str(err.explanation)), err.status_code
+    except Exception as err:
+        return jsonify(str(err)), 500
+
+
+@app.route('/start/<container_id>', methods=['GET'])
+def start_container(container_id):
+    """Start a created container."""
+    try:
+        container = client.containers.get(container_id)
+        container.start()
+        return jsonify({'success': True}), 200
     except docker.errors.APIError as err:
         return jsonify(str(err.explanation)), err.status_code
     except Exception as err:
@@ -81,13 +94,26 @@ def remove_container(container_id):
         return jsonify(str(err)), 500
 
 
-@app.route('/execute/<container_id>/<command>', methods=['GET'])
-def execute_command_in_container(container_id, command):
-    """Execute a command inside a container."""
+@app.route('/list', methods=['GET'])
+def list_containers():
+    """List all containers."""
     try:
+        containers = client.containers.list(all=True)
+        return jsonify({'containers': [container.id for container in containers]}), 200
+    except docker.errors.APIError as err:
+        return jsonify(str(err.explanation)), err.status_code
+    except Exception as err:
+        return jsonify(str(err)), 500
+
+
+@app.route('/execute/<container_id>', methods=['POST'])
+def exec_command(container_id):
+    """Execute a command in a running container."""
+    try:
+        command = request.json.get('command')
         container = client.containers.get(container_id)
-        exec_result = container.exec_run(command)
-        return jsonify({'output': exec_result.output.decode('utf-8')}), 200
+        result = container.exec_run(command)
+        return jsonify({'stdout': result.output.decode()}), 200
     except docker.errors.APIError as err:
         return jsonify(str(err.explanation)), err.status_code
     except Exception as err:
