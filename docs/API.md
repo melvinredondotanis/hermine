@@ -65,6 +65,15 @@ A Flask-based REST API for managing Docker containers.
     - Code: 200
     - Content: `{"containers": ["<container_id1>", "<container_id2>", ...]}`
 
+### Container Status
+- **URL**: `/status/<container_id>`
+- **Method**: `GET`
+- **Path Parameters**:
+    - `container_id`: ID of the container whose status is being requested
+- **Success Response**:
+    - Code: 200
+    - Content: `{"status": "<container_status>"}`
+
 ### Execute Command
 - **URL**: `/execute/<container_id>`
 - **Method**: `POST`

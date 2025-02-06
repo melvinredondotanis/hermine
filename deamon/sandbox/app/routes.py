@@ -145,6 +145,23 @@ def list_containers():
         return jsonify(str(e)), 500
 
 
+@app.route('/status/<container_id>', methods=['GET'])
+def container_status(container_id):
+    """
+    Get the status of a container.
+
+    :param container_id: The ID of the container.
+    :return: The status of the container.
+    """
+    try:
+        container = _fetch_container(container_id)
+        return jsonify({'status': container.status}), 200
+    except docker.errors.APIError as e:
+        return jsonify(str(e.explanation)), e.status_code
+    except docker.errors.DockerException as e:
+        return jsonify(str(e)), 500
+
+
 @app.route('/execute/<container_id>', methods=['POST'])
 def exec_command(container_id):
     """
