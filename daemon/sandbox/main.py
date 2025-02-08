@@ -4,7 +4,7 @@ This module serves as the main entry point for the Flask web server.
 
 from dotenv import dotenv_values
 
-from app.routes import app
+from api.sanbox import app
 
 
 config = dotenv_values(".env")

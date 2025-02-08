@@ -18,7 +18,7 @@ def _fetch_container(container_id):
     return client.containers.get(container_id)
 
 
-@app.route('/create/<image>', methods=['GET'])
+@app.route('/sandbox/create/<image>', methods=['GET'])
 def create_container(image):
     """
     Create a new container.
@@ -40,7 +40,7 @@ def create_container(image):
         return jsonify(str(e)), 500
 
 
-@app.route('/start/<container_id>', methods=['GET'])
+@app.route('/sandbox/start/<container_id>', methods=['GET'])
 def start_container(container_id):
     """
     Start a container.
@@ -59,7 +59,7 @@ def start_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/stop/<container_id>', methods=['GET'])
+@app.route('/sandbox/stop/<container_id>', methods=['GET'])
 def stop_container(container_id):
     """
     Stop a container.
@@ -78,7 +78,7 @@ def stop_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/pause/<container_id>', methods=['GET'])
+@app.route('/sandbox/pause/<container_id>', methods=['GET'])
 def pause_container(container_id):
     """
     Pause a container.
@@ -95,7 +95,7 @@ def pause_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/unpause/<container_id>', methods=['GET'])
+@app.route('/sandbox/unpause/<container_id>', methods=['GET'])
 def unpause_container(container_id):
     """
     Unpause a container.
@@ -112,7 +112,7 @@ def unpause_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/remove/<container_id>', methods=['DELETE'])
+@app.route('/sandbox/remove/<container_id>', methods=['DELETE'])
 def remove_container(container_id):
     """
     Remove a container.
@@ -129,7 +129,7 @@ def remove_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/list', methods=['GET'])
+@app.route('/sandbox/list', methods=['GET'])
 def list_containers():
     """
     List all containers.
@@ -145,7 +145,7 @@ def list_containers():
         return jsonify(str(e)), 500
 
 
-@app.route('/status/<container_id>', methods=['GET'])
+@app.route('/sandbox/status/<container_id>', methods=['GET'])
 def container_status(container_id):
     """
     Get the status of a container.
@@ -162,7 +162,7 @@ def container_status(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/execute/<container_id>', methods=['POST'])
+@app.route('/sandbox/execute/<container_id>', methods=['POST'])
 def exec_command(container_id):
     """
     Execute a command in a container.

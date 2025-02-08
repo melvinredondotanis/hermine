@@ -1,6 +1,4 @@
 # Env
-.env
-*.env
 env/
 venv/
 

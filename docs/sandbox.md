@@ -1,11 +1,11 @@
-# Sandbox
+# Sandbox API
 
 A Flask-based REST API for managing Docker containers.
 
 ## Endpoints
 
 ### Create Container
-- **URL**: `/create/<image>`
+- **URL**: `/sandbox/create/<image>`
 - **Method**: `GET`
 - **Path Parameters**: 
     - `image`: Docker image name
@@ -14,7 +14,7 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"container_id": "<container_id>"}`
 
 ### Start Container
-- **URL**: `/start/<container_id>`
+- **URL**: `/sandbox/start/<container_id>`
 - **Method**: `GET`
 - **Path Parameters**:
     - `container_id`: ID of the container
@@ -23,7 +23,7 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"success": true}`
 
 ### Stop Container
-- **URL**: `/stop/<container_id>`
+- **URL**: `/sandbox/stop/<container_id>`
 - **Method**: `GET`
 - **Path Parameters**:
     - `container_id`: ID of the container
@@ -32,7 +32,7 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"success": true}`
 
 ### Pause Container
-- **URL**: `/pause/<container_id>`
+- **URL**: `/sandbox/pause/<container_id>`
 - **Method**: `GET`
 - **Path Parameters**:
     - `container_id`: ID of the container
@@ -41,7 +41,7 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"success": true}`
 
 ### Unpause Container
-- **URL**: `/unpause/<container_id>`
+- **URL**: `/sandbox/unpause/<container_id>`
 - **Method**: `GET`
 - **Path Parameters**:
     - `container_id`: ID of the container
@@ -50,7 +50,7 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"success": true}`
 
 ### Remove Container
-- **URL**: `/remove/<container_id>`
+- **URL**: `/sandbox/remove/<container_id>`
 - **Method**: `DELETE`
 - **Path Parameters**:
     - `container_id`: ID of the container
@@ -59,14 +59,14 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"success": true}`
 
 ### List Containers
-- **URL**: `/list`
+- **URL**: `/sandbox/list`
 - **Method**: `GET`
 - **Success Response**:
     - Code: 200
     - Content: `{"containers": ["<container_id1>", "<container_id2>", ...]}`
 
 ### Container Status
-- **URL**: `/status/<container_id>`
+- **URL**: `/sandbox/status/<container_id>`
 - **Method**: `GET`
 - **Path Parameters**:
     - `container_id`: ID of the container whose status is being requested
@@ -75,7 +75,7 @@ A Flask-based REST API for managing Docker containers.
     - Content: `{"status": "<container_status>"}`
 
 ### Execute Command
-- **URL**: `/execute/<container_id>`
+- **URL**: `/sandbox/execute/<container_id>`
 - **Method**: `POST`
 - **Path Parameters**:
     - `container_id`: ID of the container
