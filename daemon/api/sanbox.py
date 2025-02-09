@@ -3,9 +3,13 @@ This module contains the routes for the sandbox API.
 """
 
 import docker
-from flask import jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
-from . import app, client
+
+from . import client
+
+
+sandbox_bp = Blueprint('sandbox', __name__)
 
 
 def _fetch_container(container_id):
@@ -18,7 +22,7 @@ def _fetch_container(container_id):
     return client.containers.get(container_id)
 
 
-@app.route('/sandbox/create/<image>', methods=['GET'])
+@sandbox_bp.route('/sandbox/create/<string:image>', methods=['GET'])
 def create_container(image):
     """
     Create a new container.
@@ -40,7 +44,7 @@ def create_container(image):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/start/<container_id>', methods=['GET'])
+@sandbox_bp.route('/sandbox/start/<string:container_id>', methods=['GET'])
 def start_container(container_id):
     """
     Start a container.
@@ -59,7 +63,7 @@ def start_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/stop/<container_id>', methods=['GET'])
+@sandbox_bp.route('/sandbox/stop/<string:container_id>', methods=['GET'])
 def stop_container(container_id):
     """
     Stop a container.
@@ -78,7 +82,7 @@ def stop_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/pause/<container_id>', methods=['GET'])
+@sandbox_bp.route('/sandbox/pause/<string:container_id>', methods=['GET'])
 def pause_container(container_id):
     """
     Pause a container.
@@ -95,7 +99,7 @@ def pause_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/unpause/<container_id>', methods=['GET'])
+@sandbox_bp.route('/sandbox/unpause/<string:container_id>', methods=['GET'])
 def unpause_container(container_id):
     """
     Unpause a container.
@@ -112,7 +116,7 @@ def unpause_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/remove/<container_id>', methods=['DELETE'])
+@sandbox_bp.route('/sandbox/remove/<string:container_id>', methods=['DELETE'])
 def remove_container(container_id):
     """
     Remove a container.
@@ -129,7 +133,7 @@ def remove_container(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/list', methods=['GET'])
+@sandbox_bp.route('/sandbox/list', methods=['GET'])
 def list_containers():
     """
     List all containers.
@@ -145,7 +149,7 @@ def list_containers():
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/status/<container_id>', methods=['GET'])
+@sandbox_bp.route('/sandbox/status/<string:container_id>', methods=['GET'])
 def container_status(container_id):
     """
     Get the status of a container.
@@ -162,7 +166,7 @@ def container_status(container_id):
         return jsonify(str(e)), 500
 
 
-@app.route('/sandbox/execute/<container_id>', methods=['POST'])
+@sandbox_bp.route('/sandbox/execute/<string:container_id>', methods=['POST'])
 def exec_command(container_id):
     """
     Execute a command in a container.
@@ -180,7 +184,7 @@ def exec_command(container_id):
             for chunk in exec_result.output:
                 yield chunk.decode(errors='replace')
 
-        return app.response_class(generate(), mimetype='text/plain')
+        return Response(generate(), mimetype='text/plain')
     except docker.errors.APIError as e:
         return jsonify(str(e.explanation)), e.status_code
     except docker.errors.DockerException as e:

@@ -1,6 +1,7 @@
 # Sandbox API
 
-A Flask-based REST API for managing Docker containers.
+## Description
+The Sandbox API provides a RESTful interface to manage Docker containers. It allows users to create, start, stop, pause, unpause, remove, list, and get status of containers. It also allows users to execute commands inside a container.
 
 ## Endpoints
 
