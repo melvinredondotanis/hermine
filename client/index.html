@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e1e1e, #323232);
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #222, #333);
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 1.5em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .chat-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-right: 10px;
+            overflow-y: auto;
+            max-height: 80vh;
+            scroll-behavior: smooth;
+        }
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 75%;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        .user-message {
+            background: linear-gradient(135deg, #4a90e2, #357ab8);
+            color: #fff;
+            align-self: flex-end;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .bot-message {
+            background: rgba(68, 68, 68, 0.9);
+            color: #fff;
+            align-self: flex-start;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .input-area {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .execute-button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9em;
+            padding: 0;
+        }
+        .input-box {
+            flex-grow: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+            transition: background 0.3s, border 0.3s;
+        }
+        .input-box:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #4a90e2;
+        }
+        /* Terminal styles */
+        .terminal-container {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(145deg, #141414, #1e1e1e);
+            color: #00ff00;
+            padding: 0 20px 20px;
+            border-radius: 12px;
+            margin: 20px;
+            overflow-y: auto;
+            font-family: monospace;
+            border: 1px solid #333;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 10px;
+        }
+        .terminal-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .control-btn {
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.9em;
+        }
+        .control-btn:hover {
+            background: #357ab8;
+        }
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-btn:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Hermine
+    </header>
+    <div class="main-content">
+        <div class="chat-container">
+            <div id="chatBox" class="chat-box"></div>
+            <div class="input-area">
+                <input id="userInput" class="input-box" type="text" placeholder="Posez une question..." onkeypress="handleKeyPress(event)">
+            </div>
+        </div>
+        <div id="terminalContainer" class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-controls">
+                    <button class="control-btn" onclick="playTerminal()">Play</button>
+                    <button class="control-btn" onclick="pauseTerminal()">Pause</button>
+                    <button class="control-btn" onclick="stopTerminal()">Stop</button>
+                    <button class="control-btn" onclick="restartTerminal()">Restart</button>
+                </div>
+                <button class="close-btn" onclick="closeTerminal()">×</button>
+            </div>
+            <p id="terminalOutput">$ Commande exécutée...</p>
+        </div>
+    </div>
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                let input = document.getElementById("userInput").value.trim();
+                if (input) {
+                    let chatBox = document.getElementById("chatBox");
+                    let userMessage = `<div class='message user-message'>${input}</div>`;
+                    chatBox.innerHTML += userMessage;
+                    document.getElementById("userInput").value = "";
+                    setTimeout(() => {
+                        let botMessage = `<div class='message bot-message'>Réponse simulée pour : ${input} <button class='execute-button' onclick='openTerminal()'>Exécuter</button></div>`;
+                        chatBox.innerHTML += botMessage;
+                    }, 500);
+                }
+            }
+        }
+        
+        function openTerminal() {
+            document.getElementById("terminalContainer").style.display = "flex";
+        }
+        
+        function closeTerminal() {
+            document.getElementById("terminalContainer").style.display = "none";
+        }
+        
+        function playTerminal() {
+            document.getElementById("terminalOutput").innerText = "$ Lecture en cours...";
+        }
+        
+        function pauseTerminal() {
+            document.getElementById("terminalOutput").innerText = "$ Pause...";
+        }
+        
+        function stopTerminal() {
+            document.getElementById("terminalOutput").innerText = "$ Arrêt...";
+        }
+        
+        function restartTerminal() {
+            document.getElementById("terminalOutput").innerText = "$ Redémarrage...";
+        }
+    </script>
+</body>
+</html>
