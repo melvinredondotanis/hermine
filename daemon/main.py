@@ -7,6 +7,7 @@ from dotenv import dotenv_values
 
 from api.sanbox import sandbox_bp
 from api.system import system_bp
+from api.history import history_bp
 
 
 config = dotenv_values(".env")
@@ -24,6 +25,7 @@ def main():
     app = Flask(__name__)
     app.register_blueprint(sandbox_bp)
     app.register_blueprint(system_bp)
+    app.register_blueprint(history_bp)
     app.run(
         debug=config["DEBUG"],
         host=config["HOST"],
