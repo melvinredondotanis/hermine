@@ -34,25 +34,22 @@ def process_modelfile():
             except UnicodeDecodeError:
                 continue
 
-        lines = content.split("\n")
-        if lines and lines[0].strip() == "False":
-            replacements = {
-                "False": "",
-                "NAME": distro.name() or 'unknown',
-                "VERSION": distro.version() or 'n/a',
-                "CODENAME":  distro.codename() or 'n/a',
-                "KERNEL": platform.release(),
-                "ARCHITECURE": platform.machine(),
-                "HOST": platform.node()
-            }
+        replacements = {
+            "NAME": distro.name() or 'unknown',
+            "VERSION": distro.version() or 'n/a',
+            "CODENAME":  distro.codename() or 'n/a',
+            "KERNEL": platform.release(),
+            "ARCHITECURE": platform.machine(),
+            "HOST": platform.node()
+        }
 
-            modified_content = content
-            for old_word, new_word in replacements.items():
-                modified_content = modified_content.replace(old_word, new_word)
-            
-            if modified_content != content:
-                with open(modelfile_path, "w") as file:
-                    file.write(modified_content)
+        modified_content = content
+        for old_word, new_word in replacements.items():
+            modified_content = modified_content.replace(old_word, new_word)
+        
+        if modified_content != content:
+            with open(modelfile_path, "w") as file:
+                file.write(modified_content)
         
         return True
     except Exception as e:
