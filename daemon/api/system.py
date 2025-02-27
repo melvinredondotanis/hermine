@@ -7,8 +7,6 @@ import platform
 from flask import Blueprint, jsonify
 import distro
 
-from smart_functions import SmartFunctions
-
 
 system_bp = Blueprint('system', __name__)
 
@@ -32,19 +30,3 @@ def about():
     except (ValueError, TypeError, AttributeError) as e:
         return jsonify({'error': str(e)}), 500
     return jsonify(system_info), 200
-
-
-@system_bp.route('/system/action/<string:function>', methods=['GET'])
-def action(function):
-    """
-    Call a smart action.
-
-    :param function: The function to perform.
-    :return: The result of the function.
-    """
-    try:
-        method = getattr(SmartFunctions, function)
-        result = method()
-    except (ValueError, TypeError, AttributeError) as e:
-        return jsonify({'error': str(e)}), 500
-    return jsonify(result), 200
