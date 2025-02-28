@@ -76,7 +76,7 @@ def get_all_chats():
 def create_chat():
     """Create a new chat session with a unique ID."""
     chat_id = str(uuid.uuid4())
-    chat_history[chat_id] = {"created_at": datetime.now().isoformat(), "messages": []}
+    chat_history[chat_id] = {"created_at": datetime.now().isoformat(), "messages": [], "container_id": None}
     return jsonify({"chat_id": chat_id})
 
 

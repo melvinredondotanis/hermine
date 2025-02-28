@@ -1,9 +1,19 @@
-# History API
+# History Module Documentation
 
-## Description
-The History API provides endpoints to manage chat history.
+## Overview
+This module provides a Flask blueprint for managing chat history persistence and retrieval through a RESTful API. It handles the creation, retrieval, modification, and deletion of chat sessions stored in a JSON database file.
 
-## Endpoints
+## Core Functions
+
+### Database Operations
+- `load_db(db_file)`: Loads chat history from the JSON database file
+- `save_db(db, db_file)`: Saves chat history to the JSON database file
+
+### Request Lifecycle Hooks
+- `load_history()`: Loads chat history before handling any request
+- `save_history(response)`: Saves chat history after handling requests
+
+## API Endpoints
 
 ### Get All Chats
 - **URL**: `/history/chats`
@@ -35,7 +45,7 @@ The History API provides endpoints to manage chat history.
 - **Description**: Retrieves the details of a specific chat.
 - **Success Response**:
     - Code: 200
-    - Content: `{"created_at": "<timestamp>", "messages": [{"user": "<user>", "message": "<message>", "timestamp": "<timestamp>"}]}`
+    - Content: `{"created_at": "<timestamp>", "messages": [{"user": "<user>", "message": "<message>", "timestamp": "<timestamp>"}], "container_id": "<container_id>"}`
 - **Error Response**:
     - Code: 404
     - Content: `{"error": "Chat not found"}`
