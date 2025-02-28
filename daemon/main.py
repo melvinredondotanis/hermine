@@ -17,7 +17,7 @@ config = dotenv_values("/etc/hermine/env.cfg")
 def process_modelfile():
     """
     Process the Modelfile by replacing specified words if the first line is '# False'.
-    
+
     Returns:
         bool: True if processing completed successfully, False otherwise.
     """
@@ -26,7 +26,7 @@ def process_modelfile():
 
         with open(modelfile_path, "rb") as file:
             raw_content = file.read()
-            
+
         for encoding in ['utf-8', 'utf-16', 'latin-1']:
             try:
                 content = raw_content.decode(encoding)
@@ -46,13 +46,13 @@ def process_modelfile():
         modified_content = content
         for old_word, new_word in replacements.items():
             modified_content = modified_content.replace(old_word, new_word)
-        
+
         if modified_content != content:
-            with open(modelfile_path, "w") as file:
+            with open(modelfile_path, "w", encoding=encoding) as file:
                 file.write(modified_content)
-        
+
         return True
-    except Exception as e:
+    except (FileNotFoundError, PermissionError, IOError) as e:
         print(f"Error processing Modelfile: {e}")
         return False
 
@@ -64,7 +64,7 @@ def main():
     This module serves as the main entry point for starting the Flask web server
     with configuration parameters defined in the config dictionary.
 
-    :return: None
+    Return: None
     """
     app = Flask(__name__)
     app.register_blueprint(sandbox_bp)

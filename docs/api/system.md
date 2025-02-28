@@ -38,3 +38,28 @@ The System API provides endpoints to retrieve system information and perform sma
 - **Error Response**:
     - Code: 500
     - Content: `{"error": "<error_message>"}`
+
+### Execute Command
+- **URL**: `/system/execute`
+- **Method**: `POST`
+- **Description**: Executes a system command.
+- **Request Body**:
+    - Content:
+        ```json
+        {
+            "command": "<system_command>"
+        }
+        ```
+- **Success Response**:
+    - Code: 200
+    - Content:
+        ```json
+        {
+            "output": "<command_output>"
+        }
+        ```
+- **Error Response**:
+    - Code: 400
+    - Content: `{"error": "No command provided"}`
+    - Code: 500
+    - Content: `{"error": "<error_message>"}`

@@ -3,8 +3,9 @@ This module contains the routes for the system API.
 """
 
 import platform
+import subprocess
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import distro
 
 
@@ -16,7 +17,8 @@ def about():
     """
     Get information about the system.
 
-    :return: Information about the system.
+    Returns:
+        dict: System information
     """
     try:
         system_info = {
@@ -30,3 +32,22 @@ def about():
     except (ValueError, TypeError, AttributeError) as e:
         return jsonify({'error': str(e)}), 500
     return jsonify(system_info), 200
+
+
+@system_bp.route('/system/execute', methods=['POST'])
+def execute():
+    """
+    Execute a command on the system.
+
+    Returns:
+        dict: Command output or error
+    """
+    data = request.get_json()
+    command = data.get('command') if data else None
+    if not command:
+        return jsonify({'error': 'No command provided'}), 400
+    try:
+        output = subprocess.check_output(command, shell=True, text=True)
+    except subprocess.CalledProcessError as e:
+        return jsonify({'error': e.output}), 500
+    return jsonify({'output': output}), 200

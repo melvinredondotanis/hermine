@@ -17,7 +17,7 @@ def _fetch_container(container_id):
     Fetch a container by its ID.
 
     :param container_id: The ID of the container.
-    :return: The container.
+    :return: The container object.
     """
     return client.containers.get(container_id)
 
