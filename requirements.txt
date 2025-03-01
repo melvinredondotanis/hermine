@@ -3,3 +3,4 @@ flask==3.1.0
 docker==7.1.0
 python-dotenv==1.0.1
 distro==1.9.0
+rich==13.9.4
