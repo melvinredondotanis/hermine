@@ -1,5 +1,6 @@
 """Main module of the application."""
 
+import re
 import sys
 import argparse
 import requests
@@ -33,11 +34,27 @@ def parse_arguments():
 def main():
     """Main function of the application."""
     global messages
-    args = parse_arguments()
+    parse_arguments()
     console = Console()
+    last_sugessted_command = None
 
     try:
-        current_chat = requests.post(f"{HOST}/history/chat").json().get("chat_id")
+        response = requests.post(f"{HOST}/history/chat")
+        json_response = response.json()
+        if isinstance(json_response, dict):
+            current_chat = json_response.get("chat_id")
+        else:
+            print(f"Error: Expected dictionary response, got {type(json_response).__name__}", file=sys.stderr)
+            return 1
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+
+    try:
+        current_container = requests.get(f"{HOST}/history/chat/{current_chat}").json().get("container_id")
+        if not current_container:
+            current_container = requests.get(f"{HOST}/sandbox/create/debian").json().get("container_id")
+            requests.post(f"{HOST}/history/chat/{current_chat}/container", json={"container_id": current_container})
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
@@ -57,6 +74,9 @@ def main():
                     print("Available commands:")
                     print("    !exit, !quit     Exit the application")
                     print("    !clear           Clear the chat")
+                    print("    !try             Try the suggested command in a container")
+                    print("    !run             Run a command in the current container")
+                    print("    !apply           Apply the suggested command to your system")
                     print("    !version         Show the version")
                     print("    !help            Show this help message")
                     continue
@@ -65,6 +85,96 @@ def main():
                     continue
                 elif user_input.lower() == '!clear':
                     messages = []
+                    continue
+                elif user_input.lower() == '!try':
+                    if last_sugessted_command:
+                        try:
+                            with console.status("[bold green]Starting container..."):
+                                response = requests.get(
+                                    f"{HOST}/sandbox/start/{current_container}"
+                                )
+                                if not response.json().get("success"):
+                                    print("Error: Failed to start container", file=sys.stderr)
+                                    continue       
+                            with console.status("[bold green]Executing..."):                                
+                                response = requests.post(
+                                    f"{HOST}/sandbox/execute/{current_container}",
+                                    json={"command": last_sugessted_command},
+                                    stream=True
+                                    )
+                                if response.status_code == 200:
+                                    console.print(
+                                        f"@container:{current_container}\n$ {last_sugessted_command}",
+                                        style="yellow"
+                                    )
+                                    for line in response.iter_lines():
+                                        if line:
+                                            console.print(
+                                                line.decode("utf-8"),
+                                                style="green"
+                                            )
+                                else:
+                                    print(f"Error: {response.json().get('error')}", file=sys.stderr)
+                        except requests.exceptions.RequestException as e:
+                            print(f"Error: {e}", file=sys.stderr)
+                    else:
+                        console.print(
+                            "No suggested command to try.",
+                            style="bold red"
+                        )
+                    continue
+                elif user_input.lower() == '!run':
+                    try:
+                        console.print(
+                            f"@container:{current_container}",
+                            style="yellow"
+                        )
+                        console.print(
+                            f"$ ",
+                            end="",
+                            style="yellow"
+                        )
+                        user_input = input()
+                        with console.status("[bold green]Executing..."):
+                            response = requests.post(
+                                f"{HOST}/sandbox/execute/{current_container}",
+                                json={"command": user_input},
+                                stream=True
+                                )
+                            if response.status_code == 200:
+                                for line in response.iter_lines():
+                                    if line:
+                                        console.print(
+                                            line.decode("utf-8"),
+                                            style="green"
+                                        )
+                            else:
+                                print(f"Error: {response.json().get('error')}", file=sys.stderr)
+                    except requests.exceptions.RequestException as e:
+                        print(f"Error: {e}", file=sys.stderr)
+                    continue
+                elif user_input.lower() == '!apply':
+                    if last_sugessted_command:
+                        try:
+                            with console.status("[bold green]Executing..."):
+                                response = requests.post(
+                                    f"{HOST}/system/execute",
+                                    json={"command": last_sugessted_command}
+                                )
+                                if response.status_code == 200:
+                                    console.print(
+                                        response.json().get("output"),
+                                        style="green"
+                                    )
+                                else:
+                                    print(f"Error: {response.json().get('error')}", file=sys.stderr)
+                        except requests.exceptions.RequestException as e:
+                            print(f"Error: {e}", file=sys.stderr)
+                    else:
+                        console.print(
+                            "No suggested command to apply.",
+                            style="bold red"
+                        )
                     continue
                 elif user_input == "":
                     continue
@@ -76,13 +186,13 @@ def main():
                     continue             
             except KeyboardInterrupt:
                 console.print(
-                    "Goodbye!",
+                    "\nGoodbye!",
                     style="bold green"
                     )
                 break
             except EOFError:
                 console.print(
-                    "Goodbye!",
+                    "\nGoodbye!",
                     style="bold green"
                     )
                 break
@@ -108,6 +218,8 @@ def main():
                         "content": response.message.content
                     }
                 ]
+            code_blocks = re.findall(r'```(?:\w+)?\s*\n(.*?)\n```', response.message.content, re.DOTALL)
+            last_sugessted_command = code_blocks[0].strip() if code_blocks else None
             output = Markdown(response.message.content)
             console.print(
                 output,
@@ -117,18 +229,18 @@ def main():
 
     except KeyboardInterrupt:
         console.print(
-            "Goodbye!",
+            "\nGoodbye!",
             style="bold green"
             )
         return 1
     except EOFError:
         console.print(
-            "Goodbye!",
+            "\nGoodbye!",
             style="bold green"
             )
         return 1
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        print(f"\nError: {e}", file=sys.stderr)
         return 1
 
 
