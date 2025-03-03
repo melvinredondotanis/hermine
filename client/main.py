@@ -74,11 +74,8 @@ def main():
         code_blocks = re.findall(r'```(?:\w+)?\s*\n(.*?)\n```', response.message.content, re.DOTALL)
         last_sugessted_command = code_blocks[0].strip() if code_blocks else None
         print(last_sugessted_command)
-        if last_sugessted_command:
-            run = subprocess.run(last_sugessted_command, shell=True, capture_output=True, text=True)
-            print(run.stdout)
-        else:
-            print("No command was found in the response.")
+        run = subprocess.run([last_sugessted_command, current_path], capture_output=True, text=True)
+        print(run.stdout)
         output = Markdown(response.message.content)
         console.print(
             output,
