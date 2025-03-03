@@ -1,6 +1,7 @@
 """Main module of the application."""
 
 import re
+import os
 import sys
 import argparse
 import requests
@@ -8,6 +9,7 @@ import requests
 from ollama import chat
 from rich.console import Console
 from rich.markdown import Markdown
+import subprocess
 
 
 VERSION = "0.0.0"
@@ -28,15 +30,61 @@ def parse_arguments():
         action='version',
         version=VERSION
         )
+    parser.add_argument(
+        '-p',
+        '--prompt',
+        type=str,
+        help='The prompt to use for the chat'
+    )
     return parser.parse_args()
 
 
 def main():
     """Main function of the application."""
     global messages
-    parse_arguments()
+    args = parse_arguments()
     console = Console()
     last_sugessted_command = None
+
+    if args.prompt:
+        current_path = os.getcwd()
+        try:
+            ls_output = subprocess.check_output(['ls', '-la', current_path], text=True)
+            context = f"Current directory: {current_path}\n\nDirectory listing:\n{ls_output}"
+        except Exception as e:
+            context = f"Error getting directory listing: {str(e)}"
+
+        messages = [
+            {
+            "role": "user",
+            "content": f"{args.prompt}\n\nRequirements: Responds to my request as well as possible with just one and the same bash command with all the actions. Context: {context}"
+            }
+        ]
+        response = chat(
+            model="hermine",
+            messages=messages
+        )
+        messages += [
+            {
+                "role": "assistant",
+                "content": response.message.content
+            }
+        ]
+        print(response.message.content)
+        code_blocks = re.findall(r'```(?:\w+)?\s*\n(.*?)\n```', response.message.content, re.DOTALL)
+        last_sugessted_command = code_blocks[0].strip() if code_blocks else None
+        print(last_sugessted_command)
+        if last_sugessted_command:
+            run = subprocess.run(last_sugessted_command, shell=True, capture_output=True, text=True)
+            print(run.stdout)
+        else:
+            print("No command was found in the response.")
+        output = Markdown(response.message.content)
+        console.print(
+            output,
+            style="bold white"
+            )
+        return 0
 
     try:
         response = requests.post(f"{HOST}/history/chat")
