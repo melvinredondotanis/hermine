@@ -5,35 +5,31 @@ Hermine is a versatile assistant created to enhance your Linux experience. It pr
 ## Installation
 
 ### Requirements
-- Python >= 3.13
+- Python
 - virtualenv
 - pip
 - Linux-based operating system
-- Docker
 
 ### Setup
-1. Clone the repository:
+1. Clone the repository
     ```bash
     git clone git@github.com:melvinredondotanis/hermine.git
     ```
-2. Launch the installation script:
+2. Launch the installation:
     ```bash
     cd hermine
-    ./install.sh
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
     ```
-
-### Uninstall
-1. Launch the uninstallation script:
+3. Export in your environment the OpenAI API key:
     ```bash
-    ./uninstall.sh
+    export OPENAI_API_KEY=your-api-key
     ```
-
-## Overview
-
-### API
-- [Sandbox](/docs/api/sandbox.md)
-- [System](/docs/api/system.md)
-- [History](/docs/api/history.md)
+4. Run the application:
+    ```bash
+    python3 hermine.py
+    ```
 
 ## Authors
 - [Melvin Redondo--Tanis]('mailto:melvin@redondotanis.com')
