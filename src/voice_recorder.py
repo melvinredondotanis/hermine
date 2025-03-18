@@ -1,7 +1,6 @@
 """
 Module for recording voice input from the microphone.
 """
-import time
 import threading
 from pathlib import Path
 import pyaudio

@@ -28,7 +28,7 @@ Hermine is a versatile assistant created to enhance your Linux experience. It pr
     ```
 4. Run the application:
     ```bash
-    python3 hermine.py
+    python3 main.py
     ```
 
 ## Authors
