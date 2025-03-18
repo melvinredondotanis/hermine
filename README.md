@@ -1,5 +1,7 @@
 # Hermine
 
+<img src="img/logo.jpg" alt="Hermine" width="300" />
+
 Hermine is a versatile assistant created to enhance your Linux experience. It provides a suite of powerful tools designed to automate your daily tasks.
 
 ## Installation
@@ -30,6 +32,13 @@ Hermine is a versatile assistant created to enhance your Linux experience. It pr
     ```bash
     python3 main.py
     ```
+
+## Features
+- [x] OpenAI GPT-3 integration
+- [X] Screen capture
+- [X] Screen lock
+- [ ] File search 
+- [ ] File management
 
 ## Authors
 - [Melvin Redondo--Tanis]('mailto:melvin@redondotanis.com')
