@@ -6,3 +6,4 @@ openai==1.65.5
 python-vlc==3.0.21203
 numpy==2.2.3
 pydbus==0.6.0
+pyaudio==0.2.14

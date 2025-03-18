@@ -372,8 +372,7 @@ class HermineWindow(Gtk.ApplicationWindow):
 
     def _on_orb_clicked(self, widget: Orb, _: Gdk.Event) -> bool:
         """Toggle orb activation and recording on click"""
-        if widget.active:
-            # Just in case we need to stop manually
+        if self.is_recording:
             widget.active = False
             self._stop_recording()
         else:
@@ -393,15 +392,17 @@ class HermineWindow(Gtk.ApplicationWindow):
 
     def _stop_recording(self) -> None:
         """Stop the current recording"""
-        self.is_recording = False
-        if self.recording_thread and self.recording_thread.is_alive():
-            self.recording_thread.join(0.5)  # Wait a bit for thread to finish
+        if self.is_recording:
+            self.voice_recorder.stop_recording()  # Signal to stop recording
+            self.is_recording = False
+            if self.recording_thread and self.recording_thread.is_alive():
+                self.recording_thread.join(0.5)  # Wait a bit for thread to finish
 
     def _recording_thread_function(self) -> None:
         """Record audio and update UI when finished"""
         try:
-            # Record audio and ignore the returned path as it's already configured
-            self.voice_recorder.record_until_silence()
+            # Record audio continuously until stopped manually
+            self.voice_recorder.record_continuously()
 
             # Update UI from main thread
             GLib.idle_add(self._recording_finished)
