@@ -280,7 +280,7 @@ class HermineWindow(Gtk.ApplicationWindow):
         self.voice_recorder = VoiceRecorder(config)
         self.recording_thread = None
         self.is_recording = False
-        self.conversation_history = None
+        self.conversation_history = []
 
         self._create_menu()
         self._setup_orb()
