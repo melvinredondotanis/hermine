@@ -21,7 +21,7 @@ class DesktopPortal:
 
         # Get the interfaces
         self.screenshot = self.desktop["org.freedesktop.portal.Screenshot"]
-        
+
         # Get the screensaver interface
         self.screensaver = self.bus.get("org.gnome.ScreenSaver", "/org/gnome/ScreenSaver")
 
@@ -38,15 +38,15 @@ class DesktopPortal:
                 "cursor": GLib.Variant('b', capture_cursor)
                 }
             return self.screenshot.Screenshot(parent_window, options)
-        except Exception as e:
+        except GLib.Error as e:
             return e
-            
+
     def lock_session(self):
         """Lock the screen using GNOME Screensaver"""
         try:
             self.screensaver.Lock()
             return True
-        except Exception as e:
+        except GLib.Error as e:
             return e
 
 

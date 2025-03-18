@@ -16,14 +16,12 @@ import cairo  # pylint: disable=wrong-import-position
 import vlc  # pylint: disable=wrong-import-position
 from openai import OpenAI  # pylint: disable=wrong-import-position
 
-# Fix import errors by using relative imports
 from voice_recorder import VoiceRecorder, RecorderConfig  # pylint: disable=wrong-import-position relative-beyond-top-level
 from tts import TextToSpeechConverter  # pylint: disable=wrong-import-position relative-beyond-top-level
 from stt import AudioTranscriber  # pylint: disable=wrong-import-position relative-beyond-top-level
 from portal_dbus import DesktopPortal  # pylint: disable=wrong-import-position relative-beyond-top-level
 from tools import search_file_and_get_urls  # pylint: disable=wrong-import-position relative-beyond-top-level
 
-# Constants for the application
 APP_NAME = "Hermine"
 APP_VERSION = "0.0.1"
 APP_DESCRIPTION = "A Linux copilot"
@@ -32,7 +30,6 @@ APP_LICENSE = "Any"
 APP_WEBSITE = "https://melvinredondotanis.github.io/hermine"
 IS_RESIZABLE = False
 
-# Constants for OpenAI API client
 CLIENT = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 PROMPT = """
             Vous êtes un assistant vocal avancé pour le système Linux.
@@ -76,7 +73,6 @@ TOOLS = [
 DBUS_PORTAL = DesktopPortal()
 
 
-# Constants for animation
 FPS = 60
 FRAME_DELAY_MS = int(1000 / FPS)
 DEFAULT_ANIMATION_SPEED = 0.025
@@ -84,7 +80,6 @@ ACTIVATION_PROBABILITY = 0.002
 ACTIVATION_DURATION_MS = 3000
 PULSE_SPEED = 0.08
 
-# Constants for rendering
 DEFAULT_SIZE = 300
 PADDING = 20
 NUM_SAMPLES = 120
@@ -114,38 +109,33 @@ class Orb(Gtk.DrawingArea):
             (0.28, 0.68, 0.96),  # Sky blue
         ]
 
-        # Animation variables
         self.time: float = 0
-        self.amplitude: float = 0.4  # Wave amplitude
-        self.active: bool = False    # Active state (when Hermine is listening)
-        self.pulse_state: float = 0  # Pulse state
+        self.amplitude: float = 0.4
+        self.active: bool = False
+        self.pulse_state: float = 0
 
-        # Start animation loop
         GLib.timeout_add(FRAME_DELAY_MS, self._update_animation)
 
     def _update_animation(self) -> bool:
         """Update animation parameters and request redraw"""
         self.time += DEFAULT_ANIMATION_SPEED
 
-        # Update pulse state if active
         if self.active:
             self.pulse_state = (self.pulse_state + PULSE_SPEED) % (2 * math.pi)
 
         self.queue_draw()
-        return True  # Continue animation
+        return True
 
     def activate(self) -> None:  # pylint: disable=arguments-differ
         """Activate the orb (start pulsing animation)"""
         self.active = True
-        # Remove the automatic deactivation timer
-        # GLib.timeout_add(ACTIVATION_DURATION_MS, self._deactivate)
 
     def _deactivate(self) -> bool:
         """Deactivate the orb (stop pulsing animation)"""
         self.active = False
-        return False  # Stop this timer
+        return False
 
-    def _on_draw(self, widget: Gtk.DrawingArea, cr: cairo.Context) -> bool:  # pylint: disable=no-member
+    def _on_draw(self, widget: Gtk.DrawingArea, cr: 'cairo.Context') -> bool:  # pylint: disable=no-member
         """Render the orb"""
         width = widget.get_allocated_width()
         height = widget.get_allocated_height()
@@ -166,43 +156,36 @@ class Orb(Gtk.DrawingArea):
 
     def _draw_orb(
         self,
-        cr: cairo.Context,  # pylint: disable=no-member
+        cr: 'cairo.Context',  # pylint: disable=no-member
         center_x: float,
         center_y: float,
         base_radius: float
         ) -> None:
         """Draw the animated orb with rings"""
-        # Calculate pulse effect
         pulse = math.sin(self.pulse_state) * 0.2 if self.active else 0
 
-        # Draw from inner to outer rings
         for ring in range(NUM_RINGS):
             radius_factor = 0.2 + 0.8 * (ring / (NUM_RINGS - 1))
         ring_radius = base_radius * radius_factor * (1.0 + pulse * (ring / NUM_RINGS))
 
-        # Get interpolated color for this ring
         color = self._get_ring_color(ring)
 
-        # Alpha intensity based on distance from center
         alpha = 0.8 if self.active else 0.6
         cr.set_source_rgba(*color, alpha * (0.2 + 0.8 * radius_factor))
 
-        # Draw waves
         self._draw_wave_circle(cr, center_x, center_y, ring_radius, radius_factor)
 
-        # Add glassy highlight effect
         self._draw_glass_highlights(cr, center_x, center_y, base_radius)
 
     def _draw_glass_highlights(
         self,
-        cr: cairo.Context,
+        cr: 'cairo.Context',
         center_x: float,
         center_y: float,
         radius: float
         ) -> None:
         """Add glassy highlights to simulate reflections on glass surface"""
-        # Top-left highlight (main light source reflection)
-        highlight = cairo.RadialGradient(
+        highlight = cairo.RadialGradient(  # pylint: disable=no-member
         center_x - radius * 0.5, center_y - radius * 0.5, 0,
         center_x - radius * 0.5, center_y - radius * 0.5, radius * 0.8
         )
@@ -231,26 +214,22 @@ class Orb(Gtk.DrawingArea):
         )
 
     def _draw_wave_circle(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-            self, cr: cairo.Context, center_x: float, center_y: float,  # pylint: disable=no-member
+            self, cr: 'cairo.Context', center_x: float, center_y: float,  # pylint: disable=no-member
             radius: float, radius_factor: float) -> None:
         """Draw a wavy circle with animated distortions"""
-        # First point
         cr.move_to(
             center_x + radius * math.cos(0),
             center_y + radius * math.sin(0)
         )
 
-        # Draw the wave segments
         for i in range(1, NUM_SAMPLES + 1):
             angle = i * 2 * math.pi / NUM_SAMPLES
 
-            # Calculate wave distortion
             wave = (math.sin(angle * 6 + self.time * 3) *
                    self.amplitude * (0.5 + 0.5 * math.sin(self.time)))
             wave += (math.sin(angle * 8 - self.time * 2) *
                     self.amplitude * 0.5)
 
-            # Enhanced wave effect when active
             if self.active:
                 wave *= 1.5
 
@@ -266,7 +245,7 @@ class Orb(Gtk.DrawingArea):
 
     def _draw_glow(
             self,
-            cr: cairo.Context,  # pylint: disable=no-member
+            cr: 'cairo.Context',  # pylint: disable=no-member
             center_x: float,
             center_y: float,
             base_radius: float
@@ -294,17 +273,15 @@ class HermineWindow(Gtk.ApplicationWindow):
         self.set_default_size(500, 500)
         self.set_position(Gtk.WindowPosition.CENTER)  # pylint: disable=no-member
 
-        # Main layout
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.add(self.main_box)  # pylint: disable=no-member
 
-        # Initialize voice recorder
         config = RecorderConfig(output_file="hermine_recording.wav")
         self.voice_recorder = VoiceRecorder(config)
         self.recording_thread = None
         self.is_recording = False
+        self.conversation_history = None
 
-        # Create menu and add orb
         self._create_menu()
         self._setup_orb()
 
@@ -313,7 +290,6 @@ class HermineWindow(Gtk.ApplicationWindow):
         self.orb = Orb()
         self.main_box.pack_start(self.orb, True, True, 0)  # pylint: disable=no-member
 
-        # Add click event to toggle activation
         self.orb.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)  # pylint: disable=no-member
         self.orb.connect("button-press-event", self._on_orb_clicked)
 
@@ -322,7 +298,6 @@ class HermineWindow(Gtk.ApplicationWindow):
         menubar = Gtk.MenuBar()
         self.main_box.pack_start(menubar, False, False, 0)  # pylint: disable=no-member
 
-        # File menu
         file_menu = self._create_menu_item("Files", menubar)
         self._create_menu_item(
             "Quit",
@@ -330,7 +305,6 @@ class HermineWindow(Gtk.ApplicationWindow):
             callback=lambda _: self.get_application().quit()
         )
 
-        # Help menu
         info_menu = self._create_menu_item("Help", menubar)
         self._create_menu_item("About", info_menu.get_submenu(),
                                callback=self._show_about_dialog)
@@ -341,12 +315,10 @@ class HermineWindow(Gtk.ApplicationWindow):
         menu_item = Gtk.MenuItem(label=label)
 
         if isinstance(parent_menu, Gtk.MenuBar):
-            # This is a top-level menu, needs a submenu
             submenu = Gtk.Menu()
             menu_item.set_submenu(submenu)
             parent_menu.append(menu_item)
         else:
-            # This is a submenu item
             if callback:
                 menu_item.connect("activate", callback)
             parent_menu.append(menu_item)
@@ -393,10 +365,9 @@ class HermineWindow(Gtk.ApplicationWindow):
     def _stop_recording(self) -> None:
         """Stop the current recording"""
         if self.is_recording:
-            self.voice_recorder.stop_recording()  # Signal to stop recording
-            self.is_recording = False
+            self.voice_recorder.stop_recording()
             if self.recording_thread and self.recording_thread.is_alive():
-                self.recording_thread.join(0.5)  # Wait a bit for thread to finish
+                self.recording_thread.join(0.5)
 
     def _recording_thread_function(self) -> None:
         """Record audio and update UI when finished"""
@@ -404,9 +375,8 @@ class HermineWindow(Gtk.ApplicationWindow):
             # Record audio continuously until stopped manually
             self.voice_recorder.record_continuously()
 
-            # Update UI from main thread
             GLib.idle_add(self._recording_finished)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error during recording: {e}")
             GLib.idle_add(self._recording_finished)
 
@@ -421,7 +391,6 @@ class HermineWindow(Gtk.ApplicationWindow):
                 {"role": "system", "content": PROMPT}
             ]
 
-        # Start transcription in a separate thread
         threading.Thread(target=self._process_transcription, daemon=True).start()
 
     def _process_transcription(self) -> None:
@@ -430,9 +399,8 @@ class HermineWindow(Gtk.ApplicationWindow):
         try:
             transcription = stt.transcribe_file("hermine_recording.wav")
             if transcription:
-                # Use GLib.idle_add to safely update from worker thread
                 GLib.idle_add(self._call_openai_api, transcription)
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-exception-caught
             print(f"Error during transcription: {e}")
 
     def _call_openai_api(self, transcription: str) -> None:
@@ -440,7 +408,6 @@ class HermineWindow(Gtk.ApplicationWindow):
         self.conversation_history.append({"role": "user", "content": transcription})
         threading.Thread(target=self._execute_openai_call, daemon=True).start()
 
-    # Fix line too long issues (lines 469-470)
     def _execute_openai_call(self) -> None:
         """Execute the OpenAI API call in a separate thread"""        
         completion = CLIENT.chat.completions.create(
@@ -449,7 +416,6 @@ class HermineWindow(Gtk.ApplicationWindow):
             tools=TOOLS
         )
 
-        # Get the response message from the completion
         response_message = completion.choices[0].message
 
         if hasattr(response_message, 'tool_calls') and response_message.tool_calls:
@@ -459,14 +425,11 @@ class HermineWindow(Gtk.ApplicationWindow):
                 elif tool_call.function.name == "lock_session":
                     DBUS_PORTAL.lock_session()
                 elif tool_call.function.name == "search_file_and_get_urls":
-                    # Parse the function arguments as JSON
                     args = json.loads(tool_call.function.arguments)
                     filename_pattern = args.get("filename_pattern")
                     print(f"Searching for files matching '{filename_pattern}'")
                     if filename_pattern:
-                        # Capture and use the returned URLs
                         results = search_file_and_get_urls(filename_pattern)
-                        # Add results to conversation context
                         if results:
                             result_message = (f"Found files matching '{filename_pattern}':\n" +
                                               "\n".join(results))
@@ -494,7 +457,7 @@ class HermineWindow(Gtk.ApplicationWindow):
             tts = TextToSpeechConverter()
             output_file = tts.generate_speech(text, "hermine_response.mp3")
             GLib.idle_add(self._play_audio, str(output_file))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-exception-caught
             print(f"Error during speech generation: {e}")
 
     def _play_audio(self, file_path: str) -> None:
