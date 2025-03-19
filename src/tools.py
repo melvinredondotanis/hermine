@@ -39,3 +39,28 @@ def search_file_and_get_urls(filename_pattern, open_browser=True):
         return matches
     except (subprocess.SubprocessError, PermissionError, FileNotFoundError) as e:
         return e
+
+
+def create_files(files, path=f'/home/{getpass.getuser()}/Bureau/'):
+    """
+    Create files with the given content.
+
+    Args:
+        files: List of dictionaries containing the name and content of the files to be created
+        path: Directory path where files should be created
+
+    Returns:
+        List of URLs of the created files
+    """
+    urls = []
+
+    os.makedirs(path, exist_ok=True)
+
+    for file in files:
+        file_path = os.path.join(path, file['name'])
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(file['content'])
+            url = f"file://{os.path.abspath(file_path)}"
+            urls.append(url)
+
+    return urls

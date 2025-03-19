@@ -20,7 +20,7 @@ from voice_recorder import VoiceRecorder, RecorderConfig  # pylint: disable=wron
 from tts import TextToSpeechConverter  # pylint: disable=wrong-import-position relative-beyond-top-level
 from stt import AudioTranscriber  # pylint: disable=wrong-import-position relative-beyond-top-level
 from portal_dbus import DesktopPortal  # pylint: disable=wrong-import-position relative-beyond-top-level
-from tools import search_file_and_get_urls  # pylint: disable=wrong-import-position relative-beyond-top-level
+from tools import search_file_and_get_urls, create_files # pylint: disable=wrong-import-position relative-beyond-top-level
 
 APP_NAME = "Hermine"
 APP_VERSION = "0.0.1"
@@ -66,6 +66,40 @@ TOOLS = [
                     }
                 },
                 "required": ["filename_pattern"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "create_files",
+            "description": "Create files with the given content",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "files": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Name of the file"
+                                },
+                                "content": {
+                                    "type": "string",
+                                    "description": "Content of the file"
+                                }
+                            },
+                            "required": ["name", "content"]
+                        }
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Directory path where files should be created"
+                    }
+                },
+                "required": ["files"]
             }
         }
     }
@@ -408,8 +442,8 @@ class HermineWindow(Gtk.ApplicationWindow):
         self.conversation_history.append({"role": "user", "content": transcription})
         threading.Thread(target=self._execute_openai_call, daemon=True).start()
 
-    def _execute_openai_call(self) -> None:
-        """Execute the OpenAI API call in a separate thread"""        
+    def _execute_openai_call(self) -> None: # pylint: disable=too-many-branches
+        """Execute the OpenAI API call in a separate thread"""
         completion = CLIENT.chat.completions.create(
             model="gpt-4o-mini",
             messages=self.conversation_history,
@@ -438,6 +472,21 @@ class HermineWindow(Gtk.ApplicationWindow):
                         self.conversation_history.append({
                             "role": "function", 
                             "name": "search_file_and_get_urls", 
+                            "content": result_message
+                        })
+                elif tool_call.function.name == "create_files":
+                    args = json.loads(tool_call.function.arguments)
+                    files = args.get("files")
+                    if files:
+                        results = create_files(files)
+                        if results:
+                            result_message = ("Files created successfully:\n" +
+                                              "\n".join(results))
+                        else:
+                            result_message = "Failed to create files"
+                        self.conversation_history.append({
+                            "role": "function", 
+                            "name": "create_files", 
                             "content": result_message
                         })
 
