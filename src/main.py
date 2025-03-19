@@ -530,10 +530,10 @@ class HermineApp(Gtk.Application):
 
 
 if __name__ == "__main__":
-        try:
-            app = HermineApp()
-            exit_status = app.run(sys.argv)
-            sys.exit(exit_status)
-        except (KeyboardInterrupt, EOFError, ValueError) as e:
-            print(e)
-            sys.exit(1)
+    try:
+        app = HermineApp()
+        exit_status = app.run(sys.argv)
+        sys.exit(exit_status)
+    except (KeyboardInterrupt, EOFError, ValueError) as e:
+        print(e)
+        sys.exit(1)
