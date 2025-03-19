@@ -34,11 +34,13 @@ Hermine is a versatile assistant created to enhance your Linux experience. It pr
     ```
 
 ## Features
-- [x] OpenAI GPT-3 integration
+- [x] OpenAI GPT-4o-mini integration
+- [X] OpenAI Whisper integration
+- [X] OpenAI STT integration
 - [X] Screen capture
 - [X] Screen lock
-- [ ] File search 
-- [ ] File management
+- [X] File search
+- [X] File creation
 
 ## Authors
 - [Melvin Redondo--Tanis]('mailto:melvin@redondotanis.com')

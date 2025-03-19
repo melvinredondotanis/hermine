@@ -32,7 +32,7 @@ IS_RESIZABLE = False
 
 CLIENT = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 PROMPT = """
-            Vous êtes un assistant vocal avancé pour le système Linux.
+            Vous êtes un assistant vocal pour le système Linux.
             \\ Votre nom est Hermine. Vous avez une connaissance approfondie
             \\ du système d'exploitation de l'utilisateur et pouvez fournir des
             \\ explications précises et efficaces.
@@ -530,6 +530,10 @@ class HermineApp(Gtk.Application):
 
 
 if __name__ == "__main__":
-    app = HermineApp()
-    exit_status = app.run(sys.argv)
-    sys.exit(exit_status)
+        try:
+            app = HermineApp()
+            exit_status = app.run(sys.argv)
+            sys.exit(exit_status)
+        except (KeyboardInterrupt, EOFError, ValueError) as e:
+            print(e)
+            sys.exit(1)
