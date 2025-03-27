@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="description" content="Hermine is a free and open-source AI assistant that helps you with your daily tasks.">
+    <meta name="keywords" content="Hermine, AI, Assistant, Open-source, Free, Linux, Tasks, Productivity">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1a202c">
+    <meta name="author" content="Melvin Redondo--Tanis">
+    <title>Hermine</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <!-- Navigation -->
+        <nav id="navbar" aria-label="Main Navigation">
+            <div class="nav-container">
+                <div class="logo">Hermine</div>
+                <button class="mobile-menu-btn" aria-expanded="false" aria-label="Menu mobile">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="#demo">Demo</a>
+                    <a href="#about">About</a>
+                </div>
+            </div>
+            <div class="mobile-menu" aria-hidden="true">
+                <a href="#home">Home</a>
+                <a href="#demo">Demo</a>
+                <a href="#about">About</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="cover-image-container">
+                <img src="img/cover.webp" 
+                     alt="Hermine Cover Image" class="cover-image" loading="eager" width="1920" height="1080">
+                <div class="overlay"></div>
+            </div>
+            <div class="hero-content">
+                <h1>Hermine</h1>
+                <p>Your free, open-source AI assistant for everyday productivity on Linux.</p>
+                <a href="#feature" class="cta-button">Download</a>
+            </div>
+        </section>
+
+        <!-- Demo Section -->
+        <section id="demo" class="demo">
+            <h2>Demonstration</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Product Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about">
+            <h2>About</h2>
+            <p>Hermine was created to provide a privacy-focused, customizable AI assistant for Linux users. Built on open-source
+            principles, it's designed to enhance productivity without compromising on user control or data privacy. Our
+            community-driven development ensures Hermine continues to evolve with user needs.</p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>Hermine</h3>
+                <p>Hermine is a free, open-source AI assistant focused on helping you accomplish daily tasks with ease. Join
+                our community to contribute to the development or simply enjoy a powerful productivity tool that
+                respects your privacy and works seamlessly on Linux.</p>
+            </div>
+            <div class="social-links">
+                <a href="https://github.com/melvinredondotanis" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/melvinredondotanis" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            2025 Hermine.
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        document.querySelector('.mobile-menu-btn').addEventListener('click', () => {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+            
+            mobileMenu.classList.toggle('active');
+            menuBtn.classList.toggle('active');
+            menuBtn.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.setAttribute('aria-hidden', isExpanded);
+        });
+
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelector('.mobile-menu').classList.remove('active');
+                document.querySelector('.mobile-menu-btn').classList.remove('active');
+                document.querySelector('.mobile-menu-btn').setAttribute('aria-expanded', 'false');
+                document.querySelector('.mobile-menu').setAttribute('aria-hidden', 'true');
+            });
+        });
+    </script>
+</body>
+</html>

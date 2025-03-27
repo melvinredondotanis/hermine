@@ -1,9 +1,0 @@
-pylint==3.3.4
-pycairo==1.27.0
-pygobject==3.50.0
-sounddevice==0.5.1
-openai==1.65.5
-python-vlc==3.0.21203
-numpy==2.2.3
-pydbus==0.6.0
-pyaudio==0.2.14
